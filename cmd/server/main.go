@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 	"watchlist-app/internal/router"
@@ -51,7 +52,19 @@ func main() {
 	// ミドルウェア設定
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: strings.Split(os.Getenv("CORS_ALLOW_ORIGINS"), ","),
+		AllowMethods: []string{
+			http.MethodGet,
+			http.MethodPost,
+			http.MethodPut,
+			http.MethodDelete,
+			http.MethodOptions,
+		},
+		AllowHeaders: []string{
+			"Content-Type",
+		},
+	}))
 
 	// ヘルスチェックエンドポイント
 	e.GET("/health", func(c echo.Context) error {
@@ -102,9 +115,7 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 		message = he.Message
 	} else if he, ok := err.(*echo.HTTPError); ok {
 		code = he.Code
-		if msg, ok := he.Message.(string); ok {
-			message = msg
-		}
+		message = fmt.Sprint(he.Message)
 	}
 
 	// 既にレスポンスがコミットされている場合は何もしない
@@ -112,7 +123,12 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 		return
 	}
 
-	if err := c.JSON(code, map[string]interface{}{"error": message}); err != nil {
+	// 本番では 5xx の詳細は固定文言にする
+	if code >= 500 && os.Getenv("APP_ENVIRONMENT") == "production" {
+		message = "Internal Server Error"
+	}
+
+	if err := c.JSON(code, map[string]interface{}{"code": code, "message": message}); err != nil {
 		c.Logger().Error("Error handling failed:", err)
 	}
 }

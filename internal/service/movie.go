@@ -152,20 +152,38 @@ func (s *MovieService) DeleteMovie(ctx context.Context, id int) error {
 // ジャンル一覧取得（統計用）
 func (s *MovieService) GetGenres(ctx context.Context) ([]string, error) {
 	var genres []string
-	err := s.client.Movie.Query().
+	genres, err := s.client.Movie.Query().
 		GroupBy(movie.FieldGenre).
-		Scan(ctx, &genres)
+		Strings(ctx)
 	if err != nil {
 		return nil, errors.NewInternalServerError("ジャンルの取得に失敗しました")
 	}
-	return genres, err
+	return genres, nil
 }
 
 // 視聴統計取得
 func (s *MovieService) GetWatchStats(ctx context.Context) (map[string]int, error) {
+	var results []struct {
+		Status movie.WatchStatus `json:"watch_status"`
+		Count  int               `json:"count"`
+	}
+
+	err := s.client.Movie.Query().
+		GroupBy(movie.FieldWatchStatus).
+		Aggregate(ent.Count()).
+		Scan(ctx, &results)
+
+	if err != nil {
+		return nil, errors.NewInternalServerError("統計情報の取得に失敗しました")
+	}
+
 	stats := make(map[string]int)
 
-	// ステータス別カウント
+	for _, r := range results {
+		stats[string(r.Status)] = r.Count
+	}
+
+	// クエリ結果にないステータスを0で初期化
 	statuses := []movie.WatchStatus{
 		movie.WatchStatusWantToWatch,
 		movie.WatchStatusWatching,
@@ -174,13 +192,9 @@ func (s *MovieService) GetWatchStats(ctx context.Context) (map[string]int, error
 	}
 
 	for _, status := range statuses {
-		count, err := s.client.Movie.Query().
-			Where(movie.WatchStatusEQ(status)).
-			Count(ctx)
-		if err != nil {
-			return nil, errors.NewInternalServerError("統計情報の取得に失敗しました")
+		if _, ok := stats[string(status)]; !ok {
+			stats[string(status)] = 0
 		}
-		stats[string(status)] = count
 	}
 
 	return stats, nil

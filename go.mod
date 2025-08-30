@@ -1,6 +1,6 @@
 module watchlist-app
 
-go 1.24.5
+go 1.24
 
 require (
 	entgo.io/ent v0.14.5

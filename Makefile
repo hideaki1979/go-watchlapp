@@ -1,4 +1,4 @@
-.PHONY: help dev build clean docker-up docker-down migrate install-tools
+.PHONY: help dev build clean docker-up docker-down migrate install-tools test generate deps
 
 help: ## Show this help
 	@echo "Available commands:"
@@ -24,7 +24,7 @@ docker-down: ## Stop Docker Compose services
 	docker-compose down
 
 migrate: ## Run database migrations
-	go run ./cmd/server
+	go run ./cmd/server -migrate
 
 test: ## Run tests
 	go test ./...

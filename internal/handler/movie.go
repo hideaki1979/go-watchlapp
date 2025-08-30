@@ -132,9 +132,7 @@ func (h *MovieHandler) DeleteMovie(c echo.Context) error {
 func (h *MovieHandler) GetGenres(c echo.Context) error {
 	genres, err := h.movieService.GetGenres(c.Request().Context())
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: "ジャンル取得に失敗しました",
-		})
+		return nil
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{"data": genres})
 }
@@ -143,9 +141,7 @@ func (h *MovieHandler) GetGenres(c echo.Context) error {
 func (h *MovieHandler) GetWatchStats(c echo.Context) error {
 	stats, err := h.movieService.GetWatchStats(c.Request().Context())
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: "統計情報取得に失敗しました",
-		})
+		return nil
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{"data": stats})
 }

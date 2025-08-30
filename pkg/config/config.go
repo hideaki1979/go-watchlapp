@@ -40,6 +40,21 @@ func Load() (*Config, error) {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
+	// 必須キーを環境変数へ明示バインド
+	_ = viper.BindEnv("app.environment")
+	_ = viper.BindEnv("server.host")
+	_ = viper.BindEnv("server.port")
+	_ = viper.BindEnv("database.user")
+	_ = viper.BindEnv("database.password")
+	_ = viper.BindEnv("database.name")
+	_ = viper.BindEnv("database.host")
+	_ = viper.BindEnv("database.port")
+
+	// セーフデフォルト
+	viper.SetDefault("app.environment", "development")
+	viper.SetDefault("server.host", "localhost")
+	viper.SetDefault("server.port", "8080")
+
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// 設定ファイルが見つからない場合は環境変数のみから読み込む

@@ -19,7 +19,7 @@
 | `GET`    | `/api/v1/movies/:id`   | 特定の作品を取得します   |
 | `PUT`    | `/api/v1/movies/:id`   | 作品情報を更新します     |
 | `DELETE` | `/api/v1/movies/:id`   | 作品を削除します         |
-| `GET`    | `/api/v1/stats/genres` | ジャンル一覧を取得します |
+| `GET`    | `/api/v1/stats/genres` | ジャンル別統計情報を取得します |
 | `GET`    | `/api/v1/stats/watch`  | 視聴統計を取得します     |
 
 ## 技術スタック
@@ -97,7 +97,7 @@
     make dev
     ```
 
-    サーバーは `http://localhost:8080` で起動します。
+    サーバーは `http://localhost:8000` で起動します。
 
 ## プロジェクト構成図
 
