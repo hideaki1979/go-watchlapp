@@ -128,7 +128,7 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 		message = "Internal Server Error"
 	}
 
-	if err := c.JSON(code, map[string]interface{}{"code": code, "message": message}); err != nil {
+	if err := c.JSON(code, map[string]any{"code": code, "message": message}); err != nil {
 		c.Logger().Error("Error handling failed:", err)
 	}
 }
