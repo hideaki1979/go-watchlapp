@@ -1,0 +1,13 @@
+server:
+  host: "localhost"
+  port: "8000"
+
+database:
+  user: "watchlist_user"
+  password: "watchlist_pass"
+  name: "watchlist"
+  host: "localhost"
+  port: 5435
+
+app:
+  environment: "development"

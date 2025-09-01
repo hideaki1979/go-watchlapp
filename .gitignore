@@ -1,0 +1,5 @@
+tmp
+.env
+bin
+.air.toml
+config.yml
